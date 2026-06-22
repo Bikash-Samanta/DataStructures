@@ -11,7 +11,7 @@
 #include <typeinfo>
 #include <memory>
 
-namespace alpha {
+namespace dsa {
 	
 	template<class _Ty>
 	struct less {
@@ -76,13 +76,13 @@ namespace alpha {
 }
 
 
-namespace alpha {
+namespace dsa {
 	template<class _Ty, class... _Args>
 	inline void construct(_Ty* _Ptr, _Args&&... _Val) {
 		new(_Ptr) _Ty(std::forward<_Args>(_Val)...);
 	}
 }
-namespace alpha {
+namespace dsa {
 	template<class _Ty> using initializer = std::initializer_list<_Ty>;
 	template <class _Ty> const char* type_name = typeid(_Ty).name();
 }

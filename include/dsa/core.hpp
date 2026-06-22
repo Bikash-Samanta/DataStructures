@@ -24,4 +24,8 @@ constexpr const unsigned long long uint64_max = -1;
 	constexpr auto const _debug = false;
 #endif
 using _SizeType = unsigned long long;
+
+#define CODE_BEGINE namespace dsa {
+#define CODE_END }
+
 #endif

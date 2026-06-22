@@ -5,7 +5,7 @@
 #include "core.hpp"
 #include "utility.hpp"
 
-namespace alpha {
+namespace dsa {
 	
 	template<class _Fn, class _Int>
 	[[nodiscard]] inline constexpr auto summation(_Int _LowerLimit, _Int _UpperLimit, _Fn _Func) {

@@ -3,7 +3,7 @@
 
 
 
-namespace alpha {
+namespace dsa {
 
 #ifdef __AVX512F__
 #define __mxi          __m512i

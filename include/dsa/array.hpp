@@ -8,7 +8,7 @@
 
 typedef unsigned long long _SizeType;
 
-namespace alpha {
+namespace dsa {
 	template<class Array>
 	class ConstArrayIterator {
 	public:
@@ -18,7 +18,7 @@ namespace alpha {
 	public:
 		constexpr ConstArrayIterator(_Ty* _Ptr)noexcept : _Ptr(_Ptr) {}
 		[[nodiscard]] constexpr _Ref operator*()const noexcept {
-			return *_Ptr;
+			return *_Ptr; 
 		}
 		[[nodiscard]] constexpr const _Ty* operator->()const noexcept {
 			return _Ptr;
@@ -150,11 +150,11 @@ namespace alpha {
 	};
 
 	template<class _Ty, class Allocator = std::allocator<_Ty>>
-	class Array {
+	class array {
 	public:
 		using ArgType = _Ty;
-		using Iterator = ArrayIterator<Array<_Ty>>;
-		using ConstIterator= ConstArrayIterator<Array<_Ty>>;
+		using Iterator = ArrayIterator<array<_Ty>>;
+		using ConstIterator= ConstArrayIterator<array<_Ty>>;
 		using Pointer = _Ty*;
 		using Reference = _Ty&;
 		using ConstReference = std::conditional_t<std::is_fundamental_v<_Ty> || std::is_pointer_v<_Ty>, const _Ty, const _Ty&>;
@@ -162,37 +162,37 @@ namespace alpha {
 		using ValueType = _Ty;
 		using SizeType = _SizeType;
 
-		explicit constexpr Array(const Allocator& allocator = Allocator())noexcept : _Siz(0), _Cap(0), _Ptr(nullptr), _Allocator(allocator) {}
+		explicit constexpr array(const Allocator& allocator = Allocator())noexcept : _Siz(0), _Cap(0), _Ptr(nullptr), _Allocator(allocator) {}
 
-		explicit constexpr Array(const SizeType _Size, ConstReference _Val = _Ty(), const Allocator& allocator = Allocator())noexcept : _Siz(_Size), _Allocator(allocator) {
+		explicit constexpr array(const SizeType _Size, ConstReference _Val = _Ty(), const Allocator& allocator = Allocator())noexcept : _Siz(_Size), _Allocator(allocator) {
 			_Allocate(_Size);
 			_Memset(_Ptr, _Ptr + _Siz, _Val);
 		}
 
-		constexpr Array(const initializer<_Ty>& list)noexcept : _Siz(list.size()) {
+		constexpr array(const initializer<_Ty>& list)noexcept : _Siz(list.size()) {
 			_Allocate(_Siz);
 			Pointer _pointer = _Ptr;
 			for (const auto& _Val : list)
 				construct(_pointer++, _Val);
 		}
 
-		constexpr Array(const Array& _That)noexcept : _Allocator(_That._Allocator) {
+		constexpr array(const array& _That)noexcept : _Allocator(_That._Allocator) {
 			_Allocate(_That._Siz);
 			_ConstructCopy(_That);
 		}
 
-		constexpr Array(Array&& _That)noexcept {
+		constexpr array(array&& _That)noexcept {
 			_Move(_That);
 		}
 		
-		constexpr ~Array()noexcept {
+		constexpr ~array()noexcept {
 			if (_Ptr != nullptr)
 				_Free();
 		}
 
-		constexpr Array& operator=(const SizeType _Size)noexcept = delete;
+		constexpr array& operator=(const SizeType _Size)noexcept = delete;
 
-		constexpr Array& operator=(const Array& _That)noexcept {
+		constexpr array& operator=(const array& _That)noexcept {
 			if (this != &_That) {
 				if (_Cap < _That._Siz)
 					_ReallocateNoCopy(_That._Siz);
@@ -202,7 +202,7 @@ namespace alpha {
 			return *this;
 		};
 
-		constexpr Array& operator=(const initializer<_Ty>& list)noexcept {
+		constexpr array& operator=(const initializer<_Ty>& list)noexcept {
 			const auto _NewSiz = list.size();
 			if (_NewSiz > _Cap)
 				_ReallocateNoCopy(_NewSiz);
@@ -213,7 +213,7 @@ namespace alpha {
 			return *this;
 		};
 
-		constexpr Array& operator=(Array&& _That)noexcept {
+		constexpr array& operator=(array&& _That)noexcept {
 			if (this != &_That) {
 				_Free();
 				_Move(_That);
@@ -221,7 +221,7 @@ namespace alpha {
 			return *this;
 		}
 
-		[[nodiscard]] constexpr bool operator==(const Array& _That)noexcept {
+		[[nodiscard]] constexpr bool operator==(const array& _That)noexcept {
 			if (_Siz != _That._Siz) return false;
 			for (SizeType i = 0; i < _Siz; ++i) {
 				if (_Ptr[i] != _That._Ptr[i]) return false;
@@ -229,7 +229,7 @@ namespace alpha {
 			return true;
 		}
 		
-		[[nodiscard]] constexpr bool operator!=(const Array& _That)noexcept {
+		[[nodiscard]] constexpr bool operator!=(const array& _That)noexcept {
 			return !(*this == _That);
 		}
 
@@ -299,17 +299,17 @@ namespace alpha {
 			}
 		}
 
-		virtual constexpr Array& operator+=(ConstReference _Arg)noexcept {
+		virtual constexpr array& operator+=(ConstReference _Arg)noexcept {
 			push_back(_Arg);
 			return *this;
 		}
 
-		virtual constexpr Array& operator+=(_Ty&& _Arg)noexcept {
+		virtual constexpr array& operator+=(_Ty&& _Arg)noexcept {
 			push_back(_Arg);
 			return *this;
 		}
 
-		virtual constexpr Array& operator+=(const Array& _That)noexcept {
+		virtual constexpr array& operator+=(const array& _That)noexcept {
 			const auto _NewSiz = _Siz + _That._Siz;
 			if (_NewSiz > _Cap)
 				_Reallocate(_NewSiz);
@@ -318,7 +318,7 @@ namespace alpha {
 			return *this;
 		}
 
-		virtual constexpr Array& operator*=(const SizeType _Int)noexcept {
+		virtual constexpr array& operator*=(const SizeType _Int)noexcept {
 			const auto _NewSiz = _Int * _Siz;
 			const auto _Range = _NewSiz >> 1;
 			if (_NewSiz > _Cap)
@@ -333,15 +333,15 @@ namespace alpha {
 			return *this;
 		}
 
-		[[nodiscard]] virtual constexpr Array operator+(ConstReference _Arg)const noexcept {
-			Array _Tmp(*this);
+		[[nodiscard]] virtual constexpr array operator+(ConstReference _Arg)const noexcept {
+			array _Tmp(*this);
 			_Tmp.push_back(_Arg);
 			return _Tmp;
 		}
 
-		[[nodiscard]] virtual constexpr Array operator+(const Array& _That)const noexcept {
+		[[nodiscard]] virtual constexpr array operator+(const array& _That)const noexcept {
 			const auto _NewSiz = _Siz + _That._Siz;
-			Array _Tmp;  _Tmp._Allocate(_NewSiz);
+			array _Tmp;  _Tmp._Allocate(_NewSiz);
 			_ConstructCopy(_Tmp._Ptr, _Ptr, _Siz);
 			_ConstructCopy(_Tmp._Ptr + _Siz, _That._Ptr, _That._Siz);
 			_Tmp._Siz = _NewSiz;
@@ -403,7 +403,7 @@ namespace alpha {
 			_Siz = _Size;
 		}
 
-		constexpr Array& insert(const SizeType _Pos, ConstReference _Val)noexcept{
+		constexpr array& insert(const SizeType _Pos, ConstReference _Val)noexcept{
 			if constexpr (_debug)
 				if (_Pos > _Siz) __debugbreak();
 			_RightShift(_Pos, 1);
@@ -411,7 +411,7 @@ namespace alpha {
 			return *this;
 		}
 
-		constexpr Array& insert(const SizeType _Pos, Array& _That)noexcept {
+		constexpr array& insert(const SizeType _Pos, array& _That)noexcept {
 			if constexpr (_debug)
 				if (_Pos > _Siz || this == &_That) __debugbreak();
 			_RightShift(_Pos, _Siz);
@@ -419,7 +419,7 @@ namespace alpha {
 			return *this;
 		}
 
-		constexpr Array& selfInsert(const SizeType _Pos)noexcept {
+		constexpr array& selfInsert(const SizeType _Pos)noexcept {
 			if constexpr (_debug)
 				if (_Pos > _Siz) __debugbreak();
 			const auto _OldSiz = _Siz;
@@ -429,7 +429,7 @@ namespace alpha {
 			return *this;
 		}
 
-		constexpr Array& insert(const SizeType _Pos, const SizeType _Len, ConstReference _Val)noexcept {
+		constexpr array& insert(const SizeType _Pos, const SizeType _Len, ConstReference _Val)noexcept {
 			if constexpr (_debug)
 				if (_Pos > _Siz) __debugbreak();
 			_RightShift(_Pos, _Len);
@@ -437,7 +437,7 @@ namespace alpha {
 			return *this;
 		}
 
-		constexpr Array& insert(const SizeType _Pos, const Array& _That, const SizeType _Subpos, const SizeType _Sublen)noexcept {
+		constexpr array& insert(const SizeType _Pos, const array& _That, const SizeType _Subpos, const SizeType _Sublen)noexcept {
 			if constexpr (_debug) {
 				if (_Subpos + _Sublen > _That._Siz || _Pos > _Siz || this == &_That)
 					__debugbreak();
@@ -447,7 +447,7 @@ namespace alpha {
 			return *this;
 		}
 
-		constexpr void swap(Array& _Arg)noexcept {
+		constexpr void swap(array& _Arg)noexcept {
 			if (this != &_Arg) {
 				_Ty*   Tmp_ptr = _Ptr;
 				_SizeType Tmp_siz = _Siz;
@@ -559,7 +559,7 @@ namespace alpha {
 					construct(_Dst + _idx, _Src[_idx]);
 		}
 
-		inline constexpr auto _ConstructCopy(const Array& _That)noexcept {
+		inline constexpr auto _ConstructCopy(const array& _That)noexcept {
 			_Siz = _That._Siz;
 			_ConstructCopy(_Ptr, _That._Ptr, _That._Siz);
 		}
@@ -571,7 +571,7 @@ namespace alpha {
 			}
 		}
 
-		inline constexpr void _Move(Array& _That)noexcept {
+		inline constexpr void _Move(array& _That)noexcept {
 			_Ptr = _That._Ptr;
 			_Siz = _That._Siz;
 			_Cap = _That._Cap;
@@ -592,7 +592,7 @@ namespace alpha {
 			}
 		}
 
-		inline constexpr auto _Copy(const Array& _That)noexcept {
+		inline constexpr auto _Copy(const array& _That)noexcept {
 			_Siz = _That._Siz;
 			_Copy(_Ptr, _That._Ptr, _That._Siz);
 		}
@@ -630,7 +630,7 @@ namespace alpha {
 		Allocator _Allocator;
 	};
 	
-	template<class _Ty, class _Allocator = std::allocator<_Ty>> using LinearContainer = Array<_Ty, _Allocator>;
+	template<class _Ty, class _Allocator = std::allocator<_Ty>> using LinearContainer = array<_Ty, _Allocator>;
 
 }
 

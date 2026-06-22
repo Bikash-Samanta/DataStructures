@@ -1,11 +1,10 @@
-#include "Array.hpp"
+#include <dsa/array.hpp>
 #include <cassert>
 #include <chrono>
 #include <iostream>
 #include <iomanip>
 #include <vector>
 #include <string>
-#include <cmath>
 
 using Clock = std::chrono::high_resolution_clock;
 using Duration = std::chrono::duration<double, std::milli>;
@@ -72,7 +71,7 @@ int Counted::destructions = 0;
 
 void validate_integer_edge_cases() {
     std::cout << "\n=== Integer edge-case validation ===" << std::endl;
-    alpha::Array<int> arr;
+    dsa::array<int> arr;
     expect(arr.size() == 0, "Default constructor should create empty array");
 
     arr.push_back(1);
@@ -103,7 +102,7 @@ void validate_integer_edge_cases() {
     expect(arr.size() == 2, "erase should decrease size");
     expect(arr[1] == 7, "erase should remove element in the middle");
 
-    const alpha::Array<int> const_arr = arr;
+    const dsa::array<int> const_arr = arr;
     expect(const_arr[0] == 1, "const operator[] should work");
 }
 
@@ -112,17 +111,17 @@ void validate_custom_type_semantics() {
 
     Counted::constructions = Counted::copies = Counted::moves = Counted::destructions = 0;
 
-    alpha::Array<Counted> arr;
+    dsa::array<Counted> arr;
     arr.push_back(Counted(10));
     arr.push_back(Counted(20));
     expect(arr.size() == 2, "Counted array should contain two elements");
     expect(arr[0].value == 10 && arr[1].value == 20, "Counted values should match inserted values");
 
-    alpha::Array<Counted> copy = arr;
+    dsa::array<Counted> copy = arr;
     expect(copy.size() == 2, "Copy constructor should preserve size");
     expect(copy[1].value == 20, "Copy constructor should preserve element values");
 
-    alpha::Array<Counted> moved = std::move(arr);
+    dsa::array<Counted> moved = std::move(arr);
     expect(moved.size() == 2, "Move constructor should preserve size");
 
     expect(Counted::moves > 0 || Counted::copies > 0, "Counted type should be moved or copied during operations");
@@ -131,16 +130,16 @@ void validate_custom_type_semantics() {
 void validate_iterator_and_addition() {
     std::cout << "\n=== Iterator and addition validation ===" << std::endl;
 
-    alpha::Array<int> arr = {1, 2, 3};
+    dsa::array<int> arr = {1, 2, 3};
     auto it = arr.begin();
     expect(*it == 1, "begin iterator should point to first element");
     ++it;
     expect(*it == 2, "iterator increment should work");
 
-    alpha::Array<int> repeated = arr + 9;
+    dsa::array<int> repeated = arr + 9;
     expect(repeated.size() == 4 && repeated[3] == 9, "operator+ should append value");
 
-    alpha::Array<int> combined = arr + repeated;
+    dsa::array<int> combined = arr + repeated;
     expect(combined.size() == 7, "operator+ should combine sizes");
     expect(combined[0] == 1 && combined[3] == 1 && combined[6] == 9, "operator+ should combine values correctly");
 }
@@ -159,7 +158,7 @@ TestResult benchmark(const std::string& name, F func, size_t operations, size_t 
 
 TestResult benchmark_push_back(size_t n, bool reserve_vector = false) {
     return benchmark("alpha::Array push_back(" + std::to_string(n) + ")", [n] {
-        alpha::Array<int> arr;
+        dsa::array<int> arr;
         for (size_t i = 0; i < n; ++i) {
             arr.push_back(static_cast<int>(i));
         }
@@ -178,7 +177,7 @@ TestResult benchmark_vector_push_back(size_t n, bool reserve_vector = false) {
 }
 
 TestResult benchmark_random_access(size_t n) {
-    alpha::Array<int> arr;
+    dsa::array<int> arr;
     for (size_t i = 0; i < n; ++i) {
         arr.push_back(static_cast<int>(i));
     }
@@ -191,7 +190,7 @@ TestResult benchmark_random_access(size_t n) {
 }
 
 TestResult benchmark_iteration(size_t n) {
-    alpha::Array<int> arr;
+    dsa::array<int> arr;
     for (size_t i = 0; i < n; ++i) {
         arr.push_back(static_cast<int>(i));
     }
@@ -204,18 +203,18 @@ TestResult benchmark_iteration(size_t n) {
 }
 
 TestResult benchmark_copy(size_t n) {
-    alpha::Array<int> arr;
+    dsa::array<int> arr;
     for (size_t i = 0; i < n; ++i) arr.push_back(static_cast<int>(i));
     return benchmark("alpha::Array copy(" + std::to_string(n) + ")", [&arr] {
-        alpha::Array<int> copy = arr;
+        dsa::array<int> copy = arr;
     }, n);
 }
 
 TestResult benchmark_move(size_t n) {
-    alpha::Array<int> arr;
+    dsa::array<int> arr;
     for (size_t i = 0; i < n; ++i) arr.push_back(static_cast<int>(i));
     return benchmark("alpha::Array move(" + std::to_string(n) + ")", [&arr] {
-        alpha::Array<int> moved = std::move(arr);
+        dsa::array<int> moved = std::move(arr);
     }, n);
 }
 
