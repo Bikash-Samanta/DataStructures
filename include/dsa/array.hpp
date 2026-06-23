@@ -3,7 +3,6 @@
 #define __DYNAMIC_ARRAY__
 
 #include "core.hpp"
-#include "simd.hpp"
 #include "utility.hpp"
 
 typedef unsigned long long _SizeType;
@@ -12,7 +11,6 @@ namespace dsa {
 	template<class Array>
 	class ConstArrayIterator {
 	public:
-		using iterator_category = std::contiguous_iterator_tag;
 		using _Ty = Array::ArgType;
 		using _Ref = const _Ty&;
 	public:
